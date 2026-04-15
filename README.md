@@ -66,6 +66,7 @@ This system acts as a personal Candidate Relationship Manager (CRM) to solve tha
 
 # Project Structure
 
+```bash
 project/
 │
 ├── controllers/
