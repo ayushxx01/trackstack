@@ -1,5 +1,5 @@
 const express = require("express");
-const { createApp, deleteApp, updateApp, fetchApps, fetchApp, updateStatus} = require("../controllers/appController");
+const { createApp, deleteApp, updateApp, fetchApps, fetchApp, updateStatus, upcomingDeadlines} = require("../controllers/appController");
 const validateToken = require("../middleware/validateToken");
 const router = express.Router();
 
@@ -10,7 +10,8 @@ router.delete("/:id", deleteApp); //we are using the validateToken middleware to
 router.put("/update/:id", updateApp);
 router.get("/fetch", fetchApps);
 router.get("/fetch/:id", fetchApp);
-router.put("/updateStatus/:id", updateStatus);
+router.patch("/updateStatus/:id", updateStatus);
+router.get("/deadline", upcomingDeadlines);
 
 //we are using the validateToken middleware to protect this route and only allow access to authenticated users, and we are using the updateApp controller to update an application in the database with the user id from the token and the application id from the request params, and we can use this route to update an application in the client side when the user clicks on the edit button and submits the updated application form etc.
 module.exports = router;

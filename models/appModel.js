@@ -28,7 +28,12 @@ const appSchema = mongoose.Schema({
     },
     appliedDate: {
         type: Date,
-        default: Date.now
+        default: Date.now,
+        required: true
+    },
+    deadlineDate: {
+        type: Date,
+        required: true
     },
     location: {
         type: String,

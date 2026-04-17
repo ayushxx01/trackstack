@@ -3,9 +3,9 @@ const asyncHandler = require("express-async-handler");
 
 const createApp = asyncHandler(async(req,res)=>{
 
-    const {companyName, position, status, coldMailStatus, appliedDate} = req.body;
+    const {companyName, position, status, coldMailStatus, appliedDate, deadlineDate} = req.body;
 
-    if(!companyName || !position || !status || !coldMailStatus || !appliedDate){
+    if(!companyName || !position || !status || !coldMailStatus || !appliedDate || !deadlineDate){
         res.status(400);
         throw new Error("Please fill all the required fields");
     }
@@ -17,6 +17,7 @@ const createApp = asyncHandler(async(req,res)=>{
         status,
         coldMailStatus,
         appliedDate,
+        deadlineDate,
         location: req.body.location || "",
         jobLink: req.body.jobLink || "",
         notes: req.body.notes || ""
@@ -67,9 +68,22 @@ notes} = req.body;
 });
 
 const fetchApps = asyncHandler(async(req,res)=>{
-    const apps = await app.find({userId: req.user.id}).sort({createdAt: -1});
-// always returns annarray , even if no application returns []
-    res.status(200).json(apps);
+    const {status, companyName} = req.query;
+    const filter = {userId: req.user.id};
+    if(status){
+        filter.status = status;
+    }
+    if(companyName){
+        filter.companyName = {$regex: companyName, $options: "i"};
+    }
+    const appls = await app.find(filter).sort({createdAt: -1});
+
+    if(!appls){
+        res.status(404);
+        throw new Error("No applications found");
+    }
+    // always returns an array, even if no applications are found
+    res.status(200).json(appls);
 });
 
 const fetchApp = asyncHandler(async(req,res)=>{
@@ -100,7 +114,26 @@ if(!appl){
     res.status(200).json(appl);
 });
 
+const upcomingDeadlines = asyncHandler(async(req,res)=>{
+    const today = new Date();
+    const deadline = parseInt(req.query.days) || 7;
+
+    const apps = await app.find({
+        userId: req.user.id,
+        deadlineDate: {
+            $gte: today,
+            $lte: new Date(today.getTime() + deadline * 24 * 60 * 60 * 1000)
+        }
+    }).sort({deadlineDate: 1});
 
 
+    if(!apps){
+        res.status(404);
+        throw new Error("No upcoming deadlines found or you have not applied to any jobs yet");
+    }
 
-module.exports = { createApp, deleteApp, updateApp, fetchApps, fetchApp , updateStatus};
+    res.status(200).json(apps);
+});
+
+
+module.exports = { createApp, deleteApp, updateApp, fetchApps, fetchApp , updateStatus, upcomingDeadlines};
