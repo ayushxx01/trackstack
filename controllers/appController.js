@@ -12,7 +12,14 @@ const createApp = asyncHandler(async(req,res)=>{
 
     const appl = await app.create({
         userId: req.user.id,
-        ...req.body
+        companyName,
+        position,
+        status,
+        coldMailStatus,
+        appliedDate,
+        location: req.body.location || "",
+        jobLink: req.body.jobLink || "",
+        notes: req.body.notes || ""
     });
 
     res.status(201).json(appl);
@@ -44,7 +51,7 @@ notes} = req.body;
         const allowedFields = {};
 
         Object.keys(req.body).forEach(key => {
-            if(allowedKeys.includes(req.body[key])){
+            if(allowedKeys.includes(key)){
                 allowedFields[key] = req.body[key];
             }
         });
@@ -75,4 +82,25 @@ const fetchApp = asyncHandler(async(req,res)=>{
 });
 
 
-module.exports = { createApp, deleteApp, updateApp, fetchApps, fetchApp };
+const updateStatus = asyncHandler(async(req,res)=>{
+const {status} = req.body;
+if(!status){
+    res.status(400);
+    throw new Error("No status set");
+}
+const id = req.params.id;
+
+const appl = await app.findOneAndUpdate({_id: id, userId: req.user.id},
+     {status},
+    {new: true, runValidators: true});
+if(!appl){
+    res.status(404);
+    throw new Error("Application not found")
+}
+    res.status(200).json(appl);
+});
+
+
+
+
+module.exports = { createApp, deleteApp, updateApp, fetchApps, fetchApp , updateStatus};
