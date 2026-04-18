@@ -46,7 +46,7 @@ const updateApp = asyncHandler(async(req,res)=> {
  location,
  jobLink,
 notes} = req.body;
-        //allowedKyes are in string format so that we can check if the key is present in the request body or not
+        //allowedKeys are in string format so that we can check if the key is present in the request body or not
         // we are using includes method of array which returns true if the key is present in the request body and false if it is not present in the request body
         const allowedKeys = ["companyName", "position", "status", "coldMailStatus", "appliedDate", "location", "jobLink", "notes"];
         const allowedFields = {};
