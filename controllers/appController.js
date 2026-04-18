@@ -5,18 +5,13 @@ const createApp = asyncHandler(async(req,res)=>{
 
     const {companyName, position, status, coldMailStatus, appliedDate, deadlineDate} = req.body;
 
-    if(!companyName || !position || !status || !coldMailStatus || !appliedDate || !deadlineDate){
-        res.status(400);
-        throw new Error("Please fill all the required fields");
-    }
-
     const appl = await app.create({
         userId: req.user.id,
         companyName,
         position,
         status,
         coldMailStatus,
-        appliedDate,
+        appliedDate: appliedDate || Date.now(),
         deadlineDate,
         location: req.body.location || "",
         jobLink: req.body.jobLink || "",
@@ -38,27 +33,11 @@ const deleteApp = asyncHandler(async(req,res)=>{
 });
 
 const updateApp = asyncHandler(async(req,res)=> {
-    const { companyName,
- position,
- status,
- coldMailStatus,
- appliedDate,
- location,
- jobLink,
-notes} = req.body;
+    
         //allowedKeys are in string format so that we can check if the key is present in the request body or not
         // we are using includes method of array which returns true if the key is present in the request body and false if it is not present in the request body
-        const allowedKeys = ["companyName", "position", "status", "coldMailStatus", "appliedDate", "location", "jobLink", "notes"];
-        const allowedFields = {};
 
-        Object.keys(req.body).forEach(key => {
-            if(allowedKeys.includes(key)){
-                allowedFields[key] = req.body[key];
-            }
-        });
-
-        const appl = await app.findOneAndUpdate({_id: req.params.id, userId: req.user.id}, allowedFields, { new: true , runValidators:true});
-
+        const appl = await app.findOneAndUpdate({_id: req.params.id, userId: req.user.id}, req.body, { new: true , runValidators:true});
         if(!appl){
             res.status(404);
             throw new Error("Application not found");
@@ -70,6 +49,10 @@ notes} = req.body;
 const fetchApps = asyncHandler(async(req,res)=>{
     const {status, companyName} = req.query;
     const filter = {userId: req.user.id};
+    if(status && !["Applied", "Under Review", "Interview", "Rejected", "Accepted"].includes(status)){
+  res.status(400)
+  throw new Error("Invalid status value")
+}
     if(status){
         filter.status = status;
     }

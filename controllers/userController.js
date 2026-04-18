@@ -7,10 +7,6 @@ const jwt = require("jsonwebtoken");
 
 const registerUser = asyncHandler(async(req, res)=>{
     const {username, email, password} = req.body;
-    if(!username || !email || !password){
-        res.status(400);
-        throw new Error("Please fill all the fields");
-    }
     const userExists = await User.findOne({email});
     if(userExists){
         res.status(400);
@@ -33,10 +29,6 @@ const registerUser = asyncHandler(async(req, res)=>{
 
 const loginUser = asyncHandler(async(req,res)=>{
     const {email, password} = req.body;
-    if(!email || !password){
-        res.status(400);
-        throw new Error("Please fill all the fields");
-    }
     const user = await User.findOne({email});
     if(user && (await Bcrypt.compare(password, user.password))){
         const token = jwt.sign({
