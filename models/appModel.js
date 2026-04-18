@@ -4,11 +4,13 @@ const appSchema = mongoose.Schema({
     userId: {
         type: mongoose.Schema.Types.ObjectId,
         required: true,
-        ref: "User"
+        ref: "User",
+        index: true
     },
     companyName: {
         type: String,
-        required: true
+        required: true,
+        index: true
     },
     position: {
         type: String,
@@ -18,7 +20,8 @@ const appSchema = mongoose.Schema({
         type: String,
         enum: ["Applied", "Under Review", "Interview", "Rejected", "Accepted"],
         default: "Applied",
-        required: true
+        required: true,
+        index: true
     },
     coldMailStatus: {
         type: String,
@@ -33,7 +36,8 @@ const appSchema = mongoose.Schema({
     },
     deadlineDate: {
         type: Date,
-        required: true
+        required: true,
+        index: true
     },
     location: {
         type: String,

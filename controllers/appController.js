@@ -49,6 +49,12 @@ const updateApp = asyncHandler(async(req,res)=> {
 const fetchApps = asyncHandler(async(req,res)=>{
     const {status, companyName} = req.query;
     const filter = {userId: req.user.id};
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 5;
+    const skip = (page - 1) * limit;
+    // filter.skip = skip;
+    // filter.limit = limit; because skip and limit are not fields in the database, we cannot use them in the filter object, we have to use them in the query method of mongoose which is find method in this case, and we can chain the skip and limit methods to the find method to implement pagination, and we can use the page and limit query parameters to get the page number and limit from the client side, and we can set default values for page and limit if they are not provided in the query parameters, and we can calculate the skip value based on the page number and limit, and we can use the skip value to skip the documents in the database and get the desired page of results, and we can use the limit value to limit the number of documents returned in the response, and we can return the paginated results to the client side.
+    // filter.page = page;
     if(status && !["Applied", "Under Review", "Interview", "Rejected", "Accepted"].includes(status)){
   res.status(400)
   throw new Error("Invalid status value")
@@ -59,14 +65,19 @@ const fetchApps = asyncHandler(async(req,res)=>{
     if(companyName){
         filter.companyName = {$regex: companyName, $options: "i"};
     }
-    const appls = await app.find(filter).sort({createdAt: -1});
+    const appls = await app.find(filter).sort({createdAt: -1}).skip(skip).limit(limit);
 
     if(!appls){
         res.status(404);
         throw new Error("No applications found");
     }
     // always returns an array, even if no applications are found
-    res.status(200).json(appls);
+    res.status(200).json({
+        page,
+        limit,
+        result: appls.length,
+        data: appls
+    });
 });
 
 const fetchApp = asyncHandler(async(req,res)=>{
