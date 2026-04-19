@@ -126,5 +126,21 @@ const upcomingDeadlines = asyncHandler(async(req,res)=>{
     res.status(200).json(apps);
 });
 
+const bulkDelete = asyncHandler(async (req, res) => {
+  const { ids } = req.body
 
-module.exports = { createApp, deleteApp, updateApp, fetchApps, fetchApp , updateStatus, upcomingDeadlines};
+  if (!ids || !Array.isArray(ids) || ids.length === 0) {
+    res.status(400)
+    throw new Error("Please provide an array of ids")
+  }
+
+  const result = await app.deleteMany({
+    _id: { $in: ids },
+    userId: req.user.id
+  })
+
+  res.status(200).json({ deletedCount: result.deletedCount })
+});
+
+
+module.exports = { createApp, deleteApp, updateApp, fetchApps, fetchApp , updateStatus, upcomingDeadlines, bulkDelete};
