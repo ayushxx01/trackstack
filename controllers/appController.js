@@ -67,10 +67,7 @@ const fetchApps = asyncHandler(async(req,res)=>{
     }
     const appls = await app.find(filter).sort({createdAt: -1}).skip(skip).limit(limit);
 
-    if(!appls){
-        res.status(404);
-        throw new Error("No applications found");
-    }
+   
     // always returns an array, even if no applications are found
     res.status(200).json({
         page,
