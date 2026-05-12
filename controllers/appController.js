@@ -1,3 +1,4 @@
+const invalidateCache = require("../config/cache");
 const app = require("../models/appModel");
 const asyncHandler = require("express-async-handler");
 
@@ -18,6 +19,8 @@ const createApp = asyncHandler(async(req,res)=>{
         notes: req.body.notes || ""
     });
 
+    invalidateCache(req.user.id);
+
     res.status(201).json(appl);
 });
 
@@ -28,7 +31,7 @@ const deleteApp = asyncHandler(async(req,res)=>{
         res.status(404);
         throw new Error("Application not found");
     }
-
+    invalidateCache(req.user.id);
     res.status(200).json(appl);
 });
 
@@ -43,6 +46,7 @@ const updateApp = asyncHandler(async(req,res)=> {
             throw new Error("Application not found");
         }
         
+        invalidateCache(req.user.id);
         res.status(200).json(appl);
 });
 
@@ -102,6 +106,7 @@ if(!appl){
     res.status(404);
     throw new Error("Application not found")
 }
+    invalidateCache(req.user.id);
     res.status(200).json(appl);
 });
 
@@ -139,6 +144,7 @@ const bulkDelete = asyncHandler(async (req, res) => {
     userId: req.user.id
   })
 
+  invalidateCache(req.user.id);
   res.status(200).json({ deletedCount: result.deletedCount })
 });
 

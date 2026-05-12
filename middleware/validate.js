@@ -1,7 +1,7 @@
 const validate = (schema) =>{
     return (req,res,next)=>{
         const rep = schema.safeParse(req.body);
-
+    
         if(!rep.success){
             console.log(rep)
             res.status(400).json({

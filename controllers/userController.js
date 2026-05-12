@@ -36,7 +36,7 @@ const loginUser = asyncHandler(async(req,res)=>{
             email: user.email,
             id: user._id //we are using this id in the validateToken middleware to verify the user and give access to the protected routes, and we get this id from the user model which is created by mongoose and is unique for each user, and we can use this id to identify the user in the database and perform operations like get, update, delete etc.
         }, process.env.ACCESS_TOKEN_SECRET, {
-            expiresIn: "10m"
+            expiresIn: "30m"
         });
         if(token){
             res.status(200).json({token});
