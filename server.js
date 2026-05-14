@@ -3,24 +3,40 @@ const connectDB = require("./config/dbConnection");
 const errorHandler = require("./middleware/errorHandler");
 const redisClient = require("./config/redisClient");
 
-const app = express();
+require("dotenv").config();
 
-require('dotenv').config();
-connectDB();
+const app = express();
 
 app.use(express.json());
 
-app.use("/api/users", require("./routes/userRoutes"));  
+app.use("/api/users", require("./routes/userRoutes"));
 app.use("/api/applications", require("./routes/appRoutes"));
 app.use("/api/getStats", require("./routes/dashRoute"));
 app.use("/api/coldMails", require("./routes/mailRoutes"));
-app.use(errorHandler)
 
+app.use(errorHandler);
 
-redisClient.connect().then(() => {
-app.listen(process.env.PORT, ()=>{
-    console.log(`Server is running on port ${process.env.PORT} and redis hogya`);
-})
-}).catch((err)=>{
-    console.log("reddis failed very sad", err);
-})
+const connectServer = async () => {
+    try {
+
+        // connect mongo
+        await connectDB();
+        console.log("MongoDB Connected");
+
+        // connect redis
+        await redisClient.connect();
+        console.log("Redis Connected");
+
+        // start server
+        app.listen(process.env.PORT, () => {
+            console.log(`Server running on port ${process.env.PORT}`);
+        });
+
+    } catch (error) {
+
+        console.error("Server startup failed:", error);
+        process.exit(1);
+    }
+};
+
+connectServer();
