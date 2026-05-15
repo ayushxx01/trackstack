@@ -4,14 +4,13 @@ const asyncHandler = require("express-async-handler");
 
 const createApp = asyncHandler(async(req,res)=>{
 
-    const {companyName, position, status, coldMailStatus, appliedDate, deadlineDate} = req.body;
+    const {companyName, position, status, appliedDate, deadlineDate} = req.body;
 
     const appl = await app.create({
         userId: req.user.id,
         companyName,
         position,
         status,
-        coldMailStatus,
         appliedDate: appliedDate || Date.now(),
         deadlineDate,
         location: req.body.location || "",
