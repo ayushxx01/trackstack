@@ -8,13 +8,16 @@ require("dotenv").config();
 const app = express();
 
 app.use(express.json());
-
+app.get("/", (req, res) => {
+    console.log("ROOT HIT");
+    res.send("Server alive");
+});
 app.use("/api/users", require("./routes/userRoutes"));
 app.use("/api/applications", require("./routes/appRoutes"));
 app.use("/api/getStats", require("./routes/dashRoute"));
 app.use("/api/coldMails", require("./routes/mailRoutes"));
 
-app.use(errorHandler);
+// app.use(errorHandler);
 
 const connectServer = async () => {
     try {

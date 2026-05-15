@@ -23,12 +23,6 @@ const appSchema = mongoose.Schema({
         required: true,
         index: true
     },
-    coldMailStatus: {
-        type: String,
-        enum: ["Not Sent", "Sent", "Replied"],
-        default: "Not Sent",
-        required: true
-    },
     appliedDate: {
         type: Date,
         default: Date.now,
