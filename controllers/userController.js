@@ -19,7 +19,15 @@ const registerUser = asyncHandler(async(req, res)=>{
         password: hashedPassword
     });
     if(user){
-        res.status(201).json({Message: `User created: ${username}`})
+        const token = jwt.sign({
+            id: user._id,
+            username: user.username,
+            email: user.email
+        }, process.env.ACCESS_TOKEN_SECRET, {
+            expiresIn: "30m"
+        });
+        res.status(201).json({token
+        })
     }
     else{
         res.status(400);
